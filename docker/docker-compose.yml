@@ -1,10 +1,8 @@
 services:
   mongodb:
-    image: 
-      mongo:7-jammy
+    image: mongo:7-jammy
 
-    container_name: 
-      mongodb
+    container_name: mongodb
 
     ports: 
       - "27007:27017"
@@ -20,3 +18,4 @@ services:
 
 networks:
   backend: 
+
