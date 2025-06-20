@@ -11,7 +11,7 @@ class ProjectModel(BaseDataModel):
     async def create_project(self, project: Project):
 
         result = await self.collection.insert_one(project.model_dump())
-        project._id = result.inserted_id
+        project.id = result.inserted_id
         return project 
     
     async def get_project_or_create_one(self, project_id: str):
@@ -19,6 +19,7 @@ class ProjectModel(BaseDataModel):
         record = await self.collection.find_one({
             "project_id": project_id
         })
+
 
         if record is None:
             # create new project
