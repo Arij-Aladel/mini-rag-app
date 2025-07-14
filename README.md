@@ -28,6 +28,16 @@ $ cp .env.example .env
 ```
 Set your environment variables in the `.env` file Like `OPENAI_API_KEY` value.
 
+## Run Docker Compose Services
+
+```bash
+$ cd docker
+$ cd .env.example .env
+
+```
+
+- update `.env`  with your credentials
+
 ## Run the FastAPI server
 ```bash
 $ uvicorn main:app --reload --host 0.0.0.0 --port 5000
@@ -35,3 +45,15 @@ $ uvicorn main:app --reload --host 0.0.0.0 --port 5000
 
 ## Postman collection
 Download the POSTMAN collection from [assets/mini-rag-app.postman_collection.json](assets/mini-rag-app.postman_collection.json)
+
+
+
+### docker cleaning 
+
+```bash
+$ docker stop $(docker ps -aq)
+$ docker rm $(docker ps -aq)  
+$ docker rmi $(docker images -q)
+$ docker volume rm $(docker docker volume ls -q)
+$ docker system prune --all  
+```
