@@ -9,7 +9,9 @@ import logging
 from .schemes.data import ProcessRequest
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
-from models.db_schemes import DataChunk
+from models.AssetModel import AssettModel
+from models.db_schemes import DataChunk, Asset
+from models.enums.AssetTypeEnum import AssetTypeEnum
 
 
 
@@ -60,9 +62,23 @@ async def upload_data(request: Request, project_id:str , file: UploadFile,
             content={"signal": ResponseSignal.FILE_UPLOAD_FAILED.value}
             )
     
+    # store the assets into the database
+    asset_model = await AssettModel.create_instance(
+        db_client=request.app.db_client
+    )
+
+    asset_resource = Asset(
+        asset_project_id =  project.id,
+        asset_type=AssetTypeEnum.FILE.value,
+        asset_name=file_id,
+        asset_size= os.path.getsize(file_path)  
+    )
+
+    asset_record = await asset_model.create_asset(asset=asset_resource)
+    
     return JSONResponse(
         content={"signal": ResponseSignal.FILE_UPLOAD_SUCCCES.value,
-                 "file_id": file_id,
+                 "file_id": str(asset_record.id),
                  },
         )
 
@@ -123,7 +139,7 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
        reset = await chunk_model.delete_chunks_by_project_id(
             project_id=project.id
             )
-       print("***************RESET***************: ", reset)
+
 
     no_records = await chunk_model.insert_many_chunks(chunks=file_chunks_records)
 
