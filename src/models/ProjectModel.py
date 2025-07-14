@@ -6,6 +6,29 @@ class ProjectModel(BaseDataModel):
     def __init__(self, db_client: object):
         super().__init__(db_client=db_client)
         self.collection = self.db_client[DataBaseEnum.COLLECTION_PROJECT_NAME.value]
+        
+
+    @classmethod
+    async def create_instance(cls, db_client: object):
+        isinstance = cls(db_client)
+        await isinstance.init_collection()
+        return isinstance
+
+
+
+    async def init_collection(self):
+        all_collection = await self.db_client.list_collection_names()
+        if DataBaseEnum.COLLECTION_PROJECT_NAME.value not in all_collection:
+            self.collection = self.db_client[DataBaseEnum.COLLECTION_PROJECT_NAME.value]
+            indexes = Project.get_indexes()
+            for index in indexes:
+                await self.collection.create_index(
+                    index["key"],
+                    name=index["name"],
+                    unique=index["unique"]
+
+
+                )
 
 
     async def create_project(self, project: Project):
@@ -32,7 +55,7 @@ class ProjectModel(BaseDataModel):
     
     async def get_all_projects(self, page: int=1, page_size: int=10):
         # count total number of documents
-        total_documents = await self.collection.count_documents({})
+        total_documents = await self.collection.count_documents({}) # will count everythig, no params given
 
         # calculate total number of pages
         total_pages = total_documents // page_size
