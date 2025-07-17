@@ -29,13 +29,35 @@ class AssettModel(BaseDataModel):
                 )
     async def create_asset(self, asset: Asset):
 
-        result = await self.collection.insert_one(asset.model_dump())
+        result = await self.collection.insert_one(asset.model_dump(exclude={"id"}))
         asset.id = result.inserted_id
 
         return asset
     
-    async def gett_all_project_assets(self, asset_project_id: str):
+    async def get_all_project_assets(self, asset_project_id: str, asset_type: str ):
 
-        return  await self.collection.find({
-            "asset_project_id": ObjectId(asset_project_id) if isinstance(asset_project_id, str) else  asset_project_id 
+        records =  await self.collection.find({
+            "asset_project_id": ObjectId(asset_project_id) if isinstance(asset_project_id, str) else  asset_project_id ,
+            "asset_type": asset_type, 
         }).to_list(length=None) # return all
+
+        return [
+            Asset(**record)
+            for record in records
+        ]
+    
+
+    async def get_aseet_record(self, asset_project_id: str, asset_name: str ):
+
+        record =  await self.collection.find_one({
+            "asset_project_id": ObjectId(asset_project_id) if isinstance(asset_project_id, str) else  asset_project_id ,
+            "asset_name": asset_name
+        })
+
+        print("********************************************************", record)
+        if record:
+            return  Asset(**record)
+        
+        return None
+
+        

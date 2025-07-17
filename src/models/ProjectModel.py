@@ -33,7 +33,7 @@ class ProjectModel(BaseDataModel):
 
     async def create_project(self, project: Project):
 
-        result = await self.collection.insert_one(project.model_dump())
+        result = await self.collection.insert_one(project.model_dump(exclude={"id"}))
         project.id = result.inserted_id
         return project 
     
