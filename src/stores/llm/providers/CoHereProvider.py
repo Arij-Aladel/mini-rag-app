@@ -89,10 +89,11 @@ class CoHereProvider(LLMInterface):
 
         )
 
-        if not response or not response.data or len(response.data) == 0 or not response.data[0].embedding:
-            self.logger.error("Error while embedding text with OpenAI")
+        if not response or not response.embeddings or not response.embeddings.float:
+            self.logger.error("Error while embedding text with coHere")
+            return None
 
-        return response.data[0].embedding
+        return response.embeddings.float[0]
         
     def construct_prompt(self, prompt: str, role: str):
         return {"role": role, 
