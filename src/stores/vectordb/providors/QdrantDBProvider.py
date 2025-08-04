@@ -70,8 +70,8 @@ class QdrantDBProvider(VectorDBInterface):
     def delete_collection(self, collection_name: str) -> bool:
         # Delete a collection from the vector database
         if self.is_connection_existed(collection_name):
-            self.client.delete_collection(collection_name=collection_name)
-            return True
+            return self.client.delete_collection(collection_name=collection_name)
+        
         return False    
 
     def insert_one(self, collection_name: str, text: str, vector: list,
