@@ -1,5 +1,5 @@
-from ..LLMInterface import LLMInterface
-from ..LLMEnums import CoHereEnum, DocumentTypeEnum
+from .. import LLMInterface
+from .. import CoHereEnum, DocumentTypeEnum
 import cohere
 import logging
 
@@ -69,7 +69,7 @@ class CoHereProvider(LLMInterface):
     
         
 
-    def emb_text(self, text: str, document_type: str = None):
+    def embed_text(self, text: str, document_type: str = None):
         
         if not self.client:
             self.logger.error("coHere client was not set")

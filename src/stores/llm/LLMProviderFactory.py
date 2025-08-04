@@ -1,4 +1,4 @@
-from .LLMEnums import  LLMEnums
+import  LLMEnums
 from .providers import CoHereProvider, OpenAIProvider
 
 
@@ -22,7 +22,6 @@ class LLMProviderFactory:
                 default_generation_max_output_tokens=self.config.GENERATION_DEFAULT_MAX_TOKENS,
                 default_generation_temperature=self.config.GENERATION_DEFAULT_TEMPERATURE
             )
-        else:
-            raise ValueError(f"Unsupported LLM provider: {provider}")
-        
+
+
         return None 
