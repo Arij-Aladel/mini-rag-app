@@ -1,5 +1,5 @@
-from ..LLMInterface import LLMInterface
-from ..LLMEnums import OpenAIEnums
+from .. import LLMInterface
+from .. import OpenAIEnums
 from openai import OpenAI
 import logging
 
@@ -26,7 +26,7 @@ class OpenAIProvider(LLMInterface):
             api_url = self.api_url
         )
 
-        self.logger = logging.logger(__name__)
+        self.logger = logging.getLogger(__name__)
 
 
     def set_generation_model(self, model_id: str):
@@ -40,7 +40,8 @@ class OpenAIProvider(LLMInterface):
         return text[:self.default_input_max_characters].strip()
 
 
-    def generate_text(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
+    def generate_text(self, prompt: str, chat_history: list=[], 
+                      max_output_tokens: int=None,
                       temperature: float = None):
         
         if not self.client:
@@ -65,7 +66,7 @@ class OpenAIProvider(LLMInterface):
             temperature=temperature
         )
 
-        if not response or not response.choices or len(response.choices) or not response.choices[0].message:
+        if not response or not response.choices or len(response.choices)==0 or not response.choices[0].message:
             self.logger.error("Error while generating text with OPENAI")
             return None
         
@@ -73,7 +74,7 @@ class OpenAIProvider(LLMInterface):
     
         
 
-    def emb_text(self, text: str, document_type: str = None):
+    def embed_text(self, text: str, document_type: str = None):
         
         if not self.client:
             self.logger.error("OPENAI client was not set")
@@ -94,5 +95,6 @@ class OpenAIProvider(LLMInterface):
         return response.data[0].embedding
         
     def construct_prompt(self, prompt: str, role: str):
-        return {"role": role, 
-                "content": self.process_text(prompt)}
+        return {
+            "role": role, 
+            "content": self.process_text(prompt)}
