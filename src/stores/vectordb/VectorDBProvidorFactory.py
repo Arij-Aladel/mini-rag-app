@@ -1,9 +1,9 @@
 from .providors import QdrantDBProvider
-import VectorDBEnums
+from .VectorDBEnums import VectorDBEnums
 from controllers import BaseController
 
 
-class VectorDBProviderFactory:
+class VectorDBProvidorFactory:
     """
     Factory class to create instances of vector database providers.
     Currently supports QdrantDB.
@@ -12,16 +12,9 @@ class VectorDBProviderFactory:
         self.config = config
         self.base_controller = BaseController()
 
-    @staticmethod
-    def create(self, provider: str, **kwargs):
-        """
-        Create a vector database provider instance based on the provider name.
-        
-        :param provider_name: Name of the vector database provider (e.g., 'QdrantDB').
-        :param kwargs: Additional parameters for provider initialization.
-        :return: An instance of the specified vector database provider.
-        """
-        
+    
+    def create(self, provider: str):
+
         if provider == VectorDBEnums.QDRANT.value:
             db_path = self.base_controller.get_database_path(db_name=self.config.VECTOR_DB_PATH)
             return QdrantDBProvider(

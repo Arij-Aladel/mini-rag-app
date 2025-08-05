@@ -54,7 +54,6 @@ class AssettModel(BaseDataModel):
             "asset_name": asset_name
         })
 
-        print("********************************************************", record)
         if record:
             return  Asset(**record)
         

@@ -1,5 +1,5 @@
 from .. import LLMInterface
-from .. import CoHereEnum, DocumentTypeEnum
+from .. import CoHereEnums, DocumentTypeEnum
 import cohere
 import logging
 
@@ -24,7 +24,7 @@ class CoHereProvider(LLMInterface):
         self.client = cohere.Client(
             api_key = self.api_key)
 
-        self.logger = logging.logger(__name__)
+        self.logger = logging.getLogger(__name__)
 
 
     def set_generation_model(self, model_id: str):
@@ -79,9 +79,9 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Embedding model for coHere was not set")
             return None
         
-        input_type = CoHereEnum.DOCUMENT if document_type == DocumentTypeEnum.DOCUMENT else CoHereEnum.QUERY
+        input_type = CoHereEnums.DOCUMENT if document_type == DocumentTypeEnum.DOCUMENT else CoHereEnums.QUERY
         
-        response = self.client.embedd(
+        response = self.client.embed(
             model = self.embedding_model_id,
             texts = [self.process_text(text)],
             input_type = input_type,
