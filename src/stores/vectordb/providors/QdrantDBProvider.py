@@ -1,14 +1,11 @@
 from qdrant_client import QdrantClient, models
-from .. import VectorDBEnums, VectorDBInterface, VectorDBProvidorFactory
-from VectorDBEnums import DistanceMethodEnums
+from ..VectorDBInterface import  VectorDBInterface
+from ..VectorDBEnums import DistanceMethodEnums
 import logging
 from typing import List
 
 
 class QdrantDBProvider(VectorDBInterface):
-    """
-    QdrantDB implementation of the VectorDBInterface.
-    """
 
     def __init__(self, dp_path: str, distance_method: str):
         
@@ -76,7 +73,7 @@ class QdrantDBProvider(VectorDBInterface):
 
     def insert_one(self, collection_name: str, text: str, vector: list,
                    metadata: dict = None,
-                   record_id: str = None):
+                   record_id: int = None):
         # Insert a single record into the specified collection
         
         if not self.is_connection_existed(collection_name):
@@ -107,25 +104,27 @@ class QdrantDBProvider(VectorDBInterface):
                     vectors: list, metadata: list = None,
                     record_ids: list = None, batch_size: int = 50):
         if metadata is None:
-            metadata = [None] *len(texts)
+            metadata = [None] * len(texts)
 
         if record_ids is None:
-            record_ids = [None] * len(texts)
+            record_ids = list(range(0, len(texts)))
 
         for i in range(0, len(texts), batch_size):
             batch_texts = texts[i:i + batch_size]
             batch_vectors = vectors[i:i + batch_size]
             batch_metadata = metadata[i:i + batch_size]
+            batch_record_ids = record_ids[i:i + batch_size] if record_ids else None
 
             records = [
                 models.Record(
+                    id=record_id,
                     vector=vector,
                     payload={
                         "text": text,
                         "metadata": meta
                     }
                 )
-                for text, vector, meta in zip(batch_texts, batch_vectors, batch_metadata)
+                for record_id, text, vector, meta in zip(batch_record_ids, batch_texts, batch_vectors, batch_metadata)
             ]
 
             if not self.is_connection_existed(collection_name):

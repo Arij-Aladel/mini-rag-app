@@ -1,3 +1,3 @@
-from .VectorDBEnums import VectorDBEnums    
+from .VectorDBEnums import VectorDBEnums, DistanceMethodEnums  
 from .VectorDBInterface import VectorDBInterface
-from .VectorDBProvidorFactory import VectorDBProvidorFactory
+from .VectorDBProvidorFactory import  VectorDBProvidorFactory
