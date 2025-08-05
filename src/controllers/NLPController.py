@@ -5,15 +5,18 @@ from stores.llm import DocumentTypeEnum, LLMInterface
 import json
 
 class NLPController(BaseController):
-    def __init__(self, vectordb_client=None, 
-                 generation_client: LLMInterface=None,
-                 embedding_client: LLMInterface=None):
+    def __init__(self, vectordb_client, 
+                 generation_client,
+                 embedding_client,
+                 template_parser=None):
         
         super().__init__()
 
         self.vectordb_client = vectordb_client
         self.generation_client = generation_client
         self.embedding_client = embedding_client
+        self.template_parser = template_parser
+
 
     def create_collection_name(self, project_id: Project):
         return f"collection_{project_id}".strip()
@@ -43,7 +46,8 @@ class NLPController(BaseController):
         metadata = [chunk.chunk_metadata for chunk in chunks]
 
         vectors = [
-            self.embedding_client.embed_text(text=text, document_type = DocumentTypeEnum.DOCUMENT.value)
+            self.embedding_client.embed_text(text=text, 
+                                             document_type = DocumentTypeEnum.DOCUMENT.value)
             for text in texts
         ]
 
