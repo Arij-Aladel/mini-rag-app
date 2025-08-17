@@ -3,6 +3,7 @@ from .. import OpenAIEnums
 from openai import OpenAI
 import logging
 
+
 class OpenAIProvider(LLMInterface):
 
     def __init__(self, api_key: str, api_url: str=None,
@@ -22,8 +23,7 @@ class OpenAIProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_size = None
 
-        self.client = OpenAI(
-            api_key = self.api_key,
+        self.client = OpenAI(api_key = self.api_key,
             base_url = self.api_url if self.api_url and len(self.api_url) else None,
             )
 
