@@ -50,7 +50,7 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Generation model for CoHere was not set")
             return None
         
-        max_output_tokens = max_output_tokens if max_output_tokens else self.max_output_tokens
+        max_output_tokens = max_output_tokens if max_output_tokens else self.default_generation_max_output_tokens
         temperature = temperature if temperature else self.default_generation_temperature
 
 
