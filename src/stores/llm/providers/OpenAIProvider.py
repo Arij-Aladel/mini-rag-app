@@ -10,6 +10,7 @@ class OpenAIProvider(LLMInterface):
                        default_input_max_characters: int=1000,
                        default_generation_max_output_tokens: int=1000,
                        default_generation_temperature: float=0.1):
+        print(OpenAI)  
         
         self.api_key = api_key
         self.api_url = api_url
@@ -23,9 +24,13 @@ class OpenAIProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_size = None
 
-        self.client = OpenAI(api_key = self.api_key,
-            base_url = self.api_url if self.api_url and len(self.api_url) else None,
-            )
+        client_args = {"api_key": self.api_key}
+        if self.api_url and len(self.api_url.strip()) > 0:
+            client_args["base_url"] = self.api_url.strip()
+
+        self.client = OpenAI(**client_args)
+
+
 
         self.enums = OpenAIEnums
         self.logger = logging.getLogger(__name__)
