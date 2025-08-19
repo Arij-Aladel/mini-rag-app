@@ -1,5 +1,5 @@
 # mini-rag-app
-This is minimal implementation of RAG model for question answering.
+This is minimal implementation of RAG model for question answering inspired by [mini-rag](https://github.com/bakrianoo/mini-rag).
 
 ## Requirements
 - pthon 3.8 or later 
