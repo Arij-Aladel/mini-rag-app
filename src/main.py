@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from routes import base, data, nlp
-from motor.motor_asyncio import AsyncIOMotorClient
 from helpers.config import get_settings
 
 from stores.llm.LLMProviderFactory import LLMProviderFactory
@@ -10,14 +9,22 @@ from stores.llm.LLMEnums import LLMEnums
 
 from stores.vectordb.VectorDBProvidorFactory import VectorDBProvidorFactory
 from stores.llm.templates.template_parser import TemplateParser
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic - Attach to app instance
     settings = get_settings()
-    app.mongo_conn = AsyncIOMotorClient(settings.MONGODB_URL)
-    app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
+    postgres_conn = f"postgresql+asyncpg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOSTNAME}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB_NAME}"
+    app.db_engine = create_async_engine(postgres_conn)
+
+    app.db_client = sessionmaker(
+        bind=app.db_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
 
     llm_provider_factory = LLMProviderFactory(settings)
     vectordb_provider_factory = VectorDBProvidorFactory(settings)
@@ -48,7 +55,7 @@ async def lifespan(app: FastAPI):
     yield  # Application runs here
 
     # Shutdown logic
-    app.mongo_conn.close()
+    app.db_engine.dispose()
     app.vectordb_client.disconnect()
     app.generation_client = None
     app.db_client = None

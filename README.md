@@ -57,3 +57,6 @@ $ docker rmi $(docker images -q)
 $ docker volume rm $(docker docker volume ls -q)
 $ docker system prune --all  
 ```
+
+### Postgres and pgvector 
+for postgres and pgvector go to [docker hub -> pgvector](https://hub.docker.com/u/pgvector)
