@@ -3,6 +3,15 @@ This is minimal implementation of RAG model for question answering inspired by [
 
 ## Requirements
 - pthon 3.8 or later 
+
+### Install dependencies for mac
+```
+brew install postgresql
+brew install gcc 
+echo 'export PATH="/opt/homebrew/opt/libpq/bin:$PATH"' >> ~/.zprofile
+source ~/.zprofile
+```
+
 ### Install python using miniConda
 1) Download and install MiniConda from [here](https://www.anaconda.com/docs/getting-started/miniconda/install)
 2) Create a new environment using the following command:

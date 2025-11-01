@@ -41,7 +41,7 @@ class ProjectModel(BaseDataModel):
                 if project is None:
                     # create a new project if it does not exist
                     project_rec = Project(project_id=project_id)
-                    project = await self.create_project(project_rec)
+                    project = await self.create_project(project=project_rec)
                     
                 return project
 

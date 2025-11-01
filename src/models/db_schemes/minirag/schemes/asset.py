@@ -16,7 +16,7 @@ class Asset(SQLAlchemyBase):
     asset_size = Column(Integer, default=0, nullable=False)
     asset_config = Column(JSONB, nullable=True)  
 
-    asset_project_id = Column(Integer, ForeignKey("projects.project_id"),nullable=False)
+    asset_project_id = Column(Integer, ForeignKey("projects.project_id"), nullable=False)
 
     project = relationship("Project", back_populates="assets")
     chunks = relationship("DataChunk", back_populates="asset")

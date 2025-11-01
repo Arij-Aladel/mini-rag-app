@@ -17,7 +17,7 @@ class VectorDBInterface(ABC):
         pass
 
     @abstractmethod
-    def is_connection_existed(self, collection_name: str) -> bool:
+    def is_collection_existed(self, collection_name: str) -> bool:
         """
         Check if a connection to the specified collection exists.
         """
@@ -64,7 +64,7 @@ class VectorDBInterface(ABC):
     @abstractmethod
     def insert_many(self, collection_name: str, texts: list,
                     vectors: list, metadata: list = None,
-                    record_ids: list = None, batch_size: int = 50):
+                    record_ids: list = None, batch_size: int = 100):
         """
         Insert multiple records into a collection.
         """

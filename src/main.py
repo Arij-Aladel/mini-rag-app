@@ -18,6 +18,7 @@ async def lifespan(app: FastAPI):
     # Startup logic - Attach to app instance
     settings = get_settings()
     postgres_conn = f"postgresql+asyncpg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOSTNAME}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB_NAME}"
+
     app.db_engine = create_async_engine(postgres_conn)
 
     app.db_client = sessionmaker(
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
     )
 
     llm_provider_factory = LLMProviderFactory(settings)
-    vectordb_provider_factory = VectorDBProvidorFactory(settings)
+    vectordb_provider_factory = VectorDBProvidorFactory(config=settings, db_client=app.db_client)
 
     #generate LLM client based on settings
     app.generation_client = llm_provider_factory.create(provider=settings.GENERATION_BACKEND)
@@ -41,10 +42,10 @@ async def lifespan(app: FastAPI):
     
     #vector database client
     app.vectordb_client = vectordb_provider_factory.create(
-        provider=settings.VECTOR_DB_BACKEND,
+        provider=settings.VECTOR_DB_BACKEND
         )
 
-    app.vectordb_client.connect() 
+    await app.vectordb_client.connect() 
 
     app.template_parser = TemplateParser(
         language=settings.PRIMARY_LANG,
@@ -56,7 +57,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown logic
     app.db_engine.dispose()
-    app.vectordb_client.disconnect()
+    await app.vectordb_client.disconnect()
     app.generation_client = None
     app.db_client = None
 
