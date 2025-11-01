@@ -12,5 +12,5 @@ cp alembic.ini.example alembic.ini
 ### Upgrade the database
 
 ```bash
-alembic upgrafe head
+alembic upgrade head
 ```
