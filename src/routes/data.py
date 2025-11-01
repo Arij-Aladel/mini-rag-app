@@ -12,10 +12,25 @@ from models.ChunkModel import ChunkModel
 from models.AssetModel import AssettModel
 from models.db_schemes import DataChunk, Asset
 from models.enums.AssetTypeEnum import AssetTypeEnum
+from controllers import NLPController
+import sys
 
 
-
+# Update logging configuration
 logger = logging.getLogger("uvicorn.error")
+logger.setLevel(logging.DEBUG)
+
+# Create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Configure handlers
+file_handler = logging.FileHandler('upload_debug.log')
+file_handler.setFormatter(formatter)
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
 
 data_router = APIRouter(
     prefix="/api/v1/data",
@@ -25,6 +40,13 @@ data_router = APIRouter(
 @data_router.post("/upload/{project_id}")
 async def upload_data(request: Request, project_id:int , file: UploadFile, 
                       app_settings: Settings = Depends(get_settings)):
+   # Add debug logging
+    logger.info("=== Upload Request Debug Info ===")
+    logger.info(f"Project ID: {project_id}")
+    logger.info(f"File: {file.filename if file else 'None'}")
+    logger.info(f"Content-Type: {file.content_type if file else 'None'}")
+    logger.info(f"Allowed Types: {app_settings.FILE_ALLOWED_TYPES}")
+
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
@@ -56,7 +78,7 @@ async def upload_data(request: Request, project_id:int , file: UploadFile,
 
     except Exception as e:
        
-       logger.error("error while uploading file: {e}")
+       logger.error(f"error while uploading file: {e}")
        
        return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -97,6 +119,13 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
     project = await project_model.get_project_or_create_one(
         project_id=project_id)
     
+    nlp_controller = NLPController(
+        vectordb_client=request.app.vectordb_client,
+        generation_client=request.app.generation_client,
+        embedding_client=request.app.embedding_client,
+        template_parser=request.app.template_parser,
+    )
+    
 
     project_files_ids = {}
     asset_model = await AssettModel.create_instance(
@@ -121,8 +150,6 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
             asset_record.asset_id: asset_record.asset_name
                              }
     else:
-
-
         project_files = await asset_model.get_all_project_assets(
             asset_project_id=project.project_id,
             asset_type=AssetTypeEnum.FILE.value,
@@ -150,7 +177,12 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
 
     chunk_model = await ChunkModel.create_instance(
         db_client=request.app.db_client)
+    
     if do_reset == 1:
+        # delete associated vectors collection
+        collection_name = nlp_controller.create_collection_name(project_id=project.project_id)
+        _ = await request.app.vectordb_client.delete_collection(collection_name=collection_name)
+        # delete associated chunks
         reset = await chunk_model.delete_chunks_by_project_id(
                 project_id=project.project_id
                 )
